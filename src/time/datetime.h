@@ -11,7 +11,7 @@ class DateTime {
 											  std::chrono::seconds>;
 
   private:
-	std::shared_ptr<const std::chrono::time_zone> tz_{
+	const std::chrono::time_zone *tz_{
 		std::chrono::current_zone()}; // 一旦あえて別に持つか。
 	TimePoint tp_{};
 
@@ -43,7 +43,7 @@ class DateTime {
 	[[nodiscard]] std::string_view time_zone() const { return tz_->name(); }
 
 	static std::strong_ordering compare_by_utc(const DateTime &l,
-											   const DateTime &r) noexcept {
+											   const DateTime &r) {
 		return l.tp_ <=> r.tp_;
 	}
 
