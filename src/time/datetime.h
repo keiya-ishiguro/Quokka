@@ -13,7 +13,7 @@ class DateTime {
   private:
 	std::shared_ptr<const std::chrono::time_zone> tz_{
 		std::chrono::current_zone()}; // 一旦あえて別に持つか。
-	TimePoint tp_;
+	TimePoint tp_{};
 
   public:
 	DateTime() = default;
@@ -42,10 +42,17 @@ class DateTime {
 
 	[[nodiscard]] std::string_view time_zone() const { return tz_->name(); }
 
+	static std::strong_ordering compare_by_utc(const DateTime &l,
+											   const DateTime &r) noexcept {
+		return l.tp_ <=> r.tp_;
+	}
+
 	friend auto operator<=>(const DateTime &l, const DateTime &r) {
-		if (auto cmp = l.tp_ <=> r.tp_; cmp != 0)
-			return cmp;
-		return l.tz_->name() <=> r.tz_->name(); // optional
+		if (l.tz_->name() != r.tz_->name()) {
+			throw std::logic_error("Two DateTime objects with different "
+								   "timezones cannot be compared.");
+		}
+		return l.tp_ <=> r.tp_;
 	}
 };
 } // namespace Quokka::Time

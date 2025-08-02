@@ -35,7 +35,7 @@ class Calendar {
 		return !is_weekend(dt) && !is_holiday(dt);
 	}
 
-	[[nodiscard]] const std::string_view time_zone() const {
+	[[nodiscard]] std::string_view time_zone() const {
 		return tz_->name();
 	}
 
