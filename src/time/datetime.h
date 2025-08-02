@@ -11,7 +11,8 @@ class DateTime {
 											  std::chrono::seconds>;
 
   private:
-	const auto *tz_{std::chrono::current_zone()}; // 一旦あえて別に持つか。
+	std::shared_ptr<const std::chrono::time_zone> tz_{
+		std::chrono::current_zone()}; // 一旦あえて別に持つか。
 	TimePoint tp_;
 
   public:
@@ -39,8 +40,12 @@ class DateTime {
 
 	[[nodiscard]] TimePoint utc_time() const { return tp_; }
 
-	[[nodiscard]] const auto *time_zone() const { return tz_; }
+	[[nodiscard]] std::string_view time_zone() const { return tz_->name(); }
 
-	friend auto operator<=>(const DateTime &, const DateTime &) = default;
+	friend auto operator<=>(const DateTime &l, const DateTime &r) {
+		if (auto cmp = l.tp_ <=> r.tp_; cmp != 0)
+			return cmp;
+		return l.tz_->name() <=> r.tz_->name(); // optional
+	}
 };
 } // namespace Quokka::Time
